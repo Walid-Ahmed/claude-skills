@@ -73,12 +73,13 @@ Only when the user wants them, and after they approve the cards. Ask which video
 
 ```bash
 python3 <skill-dir>/scripts/build_videos.py deck.py --cards OUT_DIR --out VIDEO_DIR [--mode both|questions|cards]
-python3 <skill-dir>/scripts/build_thumbnails.py deck.py --cards OUT_DIR --out VIDEO_DIR/thumbnails
+python3 <skill-dir>/scripts/build_thumbnails.py deck.py --cards OUT_DIR --out VIDEO_DIR/thumbnails [--mode both|questions|cards]
 ```
 
-- `--mode both` (default): each question with the answer hidden and a time bar (6 s), then the full card (12 s). Makes one video per topic and one with every card.
+- `--mode both` (default): each question with the answer hidden and a time bar (6 s), then the full card (12 s).
 - `--mode questions`: a quiz, every question for 10 s, no answers.
 - `--mode cards`: a review, every full card for 15 s.
+- Every mode makes one video per topic and one with every card, named with the mode (`-questions`, `-cards`) so styles never overwrite each other. Pass the same `--mode` to `build_thumbnails.py` so its names match.
 - Every video has an intro and topic title screens, and a `.txt` description whose chapters YouTube turns into clickable sections. Chapters are at least 10 seconds, which YouTube requires.
 - Videos need `ffmpeg`. Keep `VIDEO_DIR` outside any git repo, since videos are large.
 - Thumbnails are 1280 x 720 JPEGs named to match each video. `topic(..., hook="A · B · C")` sets the small line under each topic's headline.

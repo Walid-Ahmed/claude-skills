@@ -7,9 +7,10 @@
 
 Modes:
     both       each question with the answer hidden (6 s), then the full card (12 s).
-               Makes one video per topic and one with every card.
-    questions  one video of every question, no answers (10 s each), as a quiz.
-    cards      one video of every full card (15 s each), as a quick review.
+    questions  every question, no answers (10 s each), as a quiz.
+    cards      every full card (15 s each), as a quick review.
+Every mode makes one video per topic and one with every card. Names carry the mode
+(-questions, -cards), except "both", so the styles never overwrite each other.
 Every video starts with an intro, each topic with a title screen, and every question has a
 shrinking time bar. Each video gets a .txt description with YouTube chapters, one per card.
 YouTube ignores all chapters if any is under 10 seconds, so title screens fold into the next
@@ -96,6 +97,12 @@ def build(deck, cards_dir, out, mode, text_only):
     q, c = SECONDS[mode]
     per_card = q + c
     total = sum(len(t.cards) for t in deck.topics)
+    suffix = {"both": "", "questions": "-questions", "cards": "-cards"}[mode]
+    how = {
+        "both": f"Each question shows for {q} seconds. Answer it in your head, then check the card. Pause on any card to read it fully.",
+        "questions": f"Each question shows for {q} seconds. Answer it in your head, then check yourself with the full flashcards video.",
+        "cards": f"Each card shows a question and its answer for {c} seconds. Pause on any card to read it fully.",
+    }[mode]
     with tempfile.TemporaryDirectory() as tmp:
         work = pathlib.Path(tmp)
         if not text_only:
@@ -125,27 +132,22 @@ def build(deck, cards_dir, out, mode, text_only):
                 at += per_card
                 elapsed += per_card
             every += clips
-            if mode == "both":
-                name = f"{deck.slug}-{engine.folder(t, topic)}"
-                if not text_only:
-                    join(clips, out / f"{name}.mp4")
-                (out / f"{name}.txt").write_text(
-                    f"{deck.title} flashcards: {topic.title} ({len(topic.cards)} cards)\n\n"
-                    f"Each question shows for {q} seconds. Answer it in your head, then check the card. "
-                    "Pause on any card to read it fully.\n\nChapters\n" + "\n".join(chapters) + "\n")
-                print(f"{name}.mp4  {stamp(at)}")
-        suffix = {"both": "", "questions": "-questions", "cards": "-cards"}[mode]
+            # One video per topic in every mode, named with the mode so the styles never overwrite each other.
+            name = f"{deck.slug}-{engine.folder(t, topic)}{suffix}"
+            if not text_only:
+                join(clips, out / f"{name}.mp4")
+            n = len(topic.cards)
+            heading = {"both": f"{deck.title} flashcards: {topic.title} ({n} cards)",
+                       "questions": f"{deck.title} flashcards quiz: {topic.title} ({n} questions, without the answers)",
+                       "cards": f"{deck.title} flashcards: {topic.title} ({n} cards, with the answers)"}[mode]
+            (out / f"{name}.txt").write_text(f"{heading}\n\n{how}\n\nChapters\n" + "\n".join(chapters) + "\n")
+            print(f"{name}.mp4  {stamp(at)}")
         name = f"{deck.slug}-all-topics{suffix}"
         if not text_only:
             join(every, out / f"{name}.mp4")
-    heading, how = {
-        "both": (f"{deck.title} flashcards: all {total} cards in {len(deck.topics)} topics",
-                 f"Each question shows for {q} seconds. Answer it in your head, then check the card. Pause on any card to read it fully."),
-        "questions": (f"{deck.title} flashcards quiz: all {total} questions in {len(deck.topics)} topics, without the answers",
-                      f"Each question shows for {q} seconds. Answer it in your head, then check yourself with the full flashcards video."),
-        "cards": (f"{deck.title} flashcards: all {total} cards in {len(deck.topics)} topics, with the answers",
-                  f"Each card shows a question and its answer for {c} seconds. Pause on any card to read it fully."),
-    }[mode]
+    heading = {"both": f"{deck.title} flashcards: all {total} cards in {len(deck.topics)} topics",
+               "questions": f"{deck.title} flashcards quiz: all {total} questions in {len(deck.topics)} topics, without the answers",
+               "cards": f"{deck.title} flashcards: all {total} cards in {len(deck.topics)} topics, with the answers"}[mode]
     (out / f"{name}.txt").write_text(f"{heading}\n\n{how}\n\nChapters\n" + "\n".join(every_chapters) + "\n")
     print(f"{name}.mp4  {stamp(elapsed)}")
 
