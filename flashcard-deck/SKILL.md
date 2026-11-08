@@ -23,7 +23,7 @@ Ask about the following. The tool takes up to 4 questions, so when the source is
 - **Source**: what the cards cover. Options such as: material they already have (files or a folder: PDFs, slides, Word or Markdown notes, a course, a repo, or existing flashcards), this repo, a subject from your own knowledge, or notes they will paste. If the request already names the source, skip this.
 - **How closely to follow it** (only when the source is their material): only what the material says (Recommended), the material plus missing basics marked as added, or the material as a starting point.
 - **Audience and depth**: beginner (one idea per card, plain words), intermediate (concepts plus a short code example), or advanced (trade-offs, edge cases).
-- **Size**: about 10 cards (a quick set), about 25, about 40+ (a full course), or, for their own material, as many as the material needs. More cards means more topics, not longer cards.
+- **Maximum number of cards**: up to 10 (a quick set), up to 20 (Recommended), up to 40 (a full course), or no limit (as many as the material needs). The user can type any other number. Record it as `deck(..., max_cards=N)`: the build stops if the deck grows past it, so splitting cards later cannot quietly break the limit. More cards means more topics, not longer cards.
 - **Outputs**: card images and PDFs only (Recommended), plus videos, plus videos and thumbnails. Videos come after the cards are approved either way.
 
 Then, if still unknown, ask in plain text (no tool needed): the deck title shown on every card (such as "FastAPI" or "Kubernetes"), where to save the output (suggest a `flashcards/` folder in the current project, or a new folder), and whether code examples may name the source project or should stay generic. For the user's own material, also ask whether each card should show where it comes from (such as "Ch. 3, p. 42").
@@ -31,6 +31,8 @@ Then, if still unknown, ask in plain text (no tool needed): the deck title shown
 ## 2. Plan
 
 Read the source first. **If it is material the user already has, read `references/existing-material.md` now**: it covers reading PDFs, slides, Word files, folders, and existing flashcards, mapping all of the material so nothing is silently dropped, staying faithful to it, and pointing each card back to its page. For a subject from your own knowledge, decide what a learner at the chosen level needs. Then propose the deck as a short list: topics in learning order, and under each, one line per card with its question. Group by concept (HTTP basics, validation, auth), not by file. Aim for 3 to 9 cards per topic. A small deck (under about 12 cards) is fine as 2 or 3 topics of 2 to 4 cards.
+
+Keep the plan within the maximum number of cards, and leave room for a split or two. If the material needs more cards than the maximum allows, cover the core ideas first, then list the topics or sections left out, and offer to raise the limit.
 
 Show the plan and ask for a yes, changes, or cuts before writing cards. Writing 40 cards on the wrong topics wastes the most time, so this check is worth one round trip.
 
@@ -60,6 +62,7 @@ python3 <skill-dir>/scripts/build_deck.py deck.py --out OUT_DIR --topic 1   # on
 `<skill-dir>` is the folder this SKILL.md is in. Use `python3`, or `python` where that is Python 3. The script needs Python with `playwright` and `Pillow` (`pip install playwright pillow`), plus Google Chrome or `playwright install chromium`. It renders every card as a 2400 x 1698 px A4 landscape PNG, checks that each card's content fits (height and width), and stops naming any card that does not. Then it writes one PDF per topic, `print/all-cards.pdf`, and `README.md`.
 
 - **Repeated content**: the fit check measures size, not sense. Look for a box that repeats a step or the lead, and cut it.
+- **Over the maximum**: the build stops if the deck has more cards than `max_cards`. Merge or drop the least important cards, or ask the user to raise the limit. Do not raise it on your own.
 - **A card does not fit**: shorten the text, drop a box, or split it into two cards (such as "9a" and "9b", or two questions). Never shrink the font to squeeze it in; the cards must stay readable when printed.
 - **Look at every card** after rendering, by opening the PNGs. The fit check catches overflow, not a confusing card, a diagram that misleads, or a typo. Fix and re-render; `--topic N` re-renders one topic quickly.
 - **Spare space is normal.** The build reports spare space in CSS px on the 1200 x 849 card (the PNG is twice that). A simple card often leaves 150 to 350 px empty, and that is fine for reading and printing. Do not pad a card to fill it. If a card leaves over about 400 px and feels thin, it may deserve a diagram or an example, or it may belong merged into a neighbouring card.
