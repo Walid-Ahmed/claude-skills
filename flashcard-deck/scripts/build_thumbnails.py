@@ -50,7 +50,7 @@ def inline(path):
     return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode()
 
 
-def thumbnails(deck, cards_dir):
+def thumbnails(deck, cards_dir, mode="both"):
     total = sum(len(t.cards) for t in deck.topics)
     pngs = [(t, sorted((cards_dir / engine.folder(t, topic)).glob("*.png"))) for t, topic in enumerate(deck.topics, start=1)]
     first, last = pngs[0][1], pngs[-1][1]
@@ -65,7 +65,8 @@ def thumbnails(deck, cards_dir):
     yield f"{deck.slug}-all-topics-cards", {**full, "title": f"{deck.title} in {minutes} Minute{'' if minutes == 1 else 's'}", "badge": f"{total} FLASHCARDS"}
     for t, topic in enumerate(deck.topics, start=1):
         files = pngs[t - 1][1]
-        yield f"{deck.slug}-{engine.folder(t, topic)}", dict(
+        suffix = {"both": "", "questions": "-questions", "cards": "-cards"}[mode]  # match build_videos.py names
+        yield f"{deck.slug}-{engine.folder(t, topic)}{suffix}", dict(
             main=topic.colour[0], dark=topic.colour[1], kicker=f"{deck.title} flashcards", title=topic.title,
             hook=topic.hook, badge=f"{len(topic.cards)} Q&amp;A", back=inline(files[min(1, len(files) - 1)]),
             front=inline(files[0]), mark="")
@@ -76,6 +77,8 @@ def main():
     parser.add_argument("deck")
     parser.add_argument("--cards", required=True, help="the folder build_deck.py wrote")
     parser.add_argument("--out", required=True, help="where the thumbnails go")
+    parser.add_argument("--mode", choices=["both", "questions", "cards"], default="both",
+                        help="the video style, so topic thumbnails match the video names")
     args = parser.parse_args()
     deck = engine.load_deck(args.deck)
     cards_dir = pathlib.Path(args.cards).resolve()
@@ -83,7 +86,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     with engine.browser() as b:
         tab = b.new_page(viewport={"width": 1280, "height": 720})
-        for name, settings in thumbnails(deck, cards_dir):
+        for name, settings in thumbnails(deck, cards_dir, args.mode):
             tab.set_content(PAGE.format(fonts=engine.FONTS, **settings), wait_until="networkidle")
             tab.evaluate("document.fonts.ready")
             size = tab.evaluate(FIT)
