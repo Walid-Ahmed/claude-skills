@@ -11,6 +11,7 @@ from flashcards import (  # noqa: F401  (all helpers, so they are at hand while 
 DECK = deck(
     title="Git",  # shown on every card: "GIT · BRANCHES"
     credit="",    # optional README line, such as where the examples come from
+    max_cards=20,  # the most cards the user asked for; the build stops above it (0 = no limit)
     topics=[
         topic("Basics", hook="Commit · Staging · Log", cards=[
             card("staging-area", "Why does Git have a staging area?",

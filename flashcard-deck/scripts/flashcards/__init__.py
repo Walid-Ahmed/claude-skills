@@ -50,14 +50,15 @@ class Deck:
     credit: str = ""      # optional line for the README, such as where the examples come from
     slug: str = ""        # file name prefix for videos and thumbnails; from the title when left out
     extra_css: str = field(default="")  # rarely needed: extra styles for this deck
+    max_cards: int = 0    # the most cards the user wants; 0 means no limit
 
 
-def deck(title, topics, credit="", slug="", extra_css=""):
+def deck(title, topics, credit="", slug="", extra_css="", max_cards=0):
     for i, t in enumerate(topics):
         if t.colour is None:
             t.colour = PALETTE[i % len(PALETTE)]
     slug = slug or (_re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-") + "-flashcards")
-    return Deck(title, topics, credit, slug, extra_css)
+    return Deck(title, topics, credit, slug, extra_css, max_cards)
 
 
 def topic(title, cards, colour=None, hook=""):

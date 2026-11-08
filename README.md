@@ -44,6 +44,12 @@ Make a deck of question-and-answer flashcards that teach the concept first, prin
 
 <p align="center"><img src="docs/flashcard-deck/sample-thumbnail.jpg" alt="A sample YouTube thumbnail: 'Git in 1 Minute' with two flashcards fanned on the right" width="480"></p>
 
+### Example
+
+**[FastAPI Flashcards: from Routes to JWT Authentication](https://www.youtube.com/watch?v=dwvtkUu2rbM&t=4s)** is a FastAPI flashcard deck in this style, made into a YouTube video.
+
+<p align="center"><a href="https://www.youtube.com/watch?v=dwvtkUu2rbM&t=4s"><img src="https://i.ytimg.com/vi/dwvtkUu2rbM/hqdefault.jpg" alt="FastAPI Flashcards: from Routes to JWT Authentication, on YouTube" width="480"></a></p>
+
 ### How to use it
 
 Ask in your own words, in any project:
@@ -59,7 +65,7 @@ Claude then:
    - the source of the cards
    - how closely to follow your material
    - who the cards are for
-   - how many cards
+   - the maximum number of cards (the build stops if the deck grows past it)
    - which outputs you want
 2. **Proposes a plan**: the topics, and the question on each card. When working from your material, it also shows which pages or sections each topic covers. Nothing is written until you approve.
 3. **Builds the first topic** and shows you a few cards to check the style and depth. Then it builds the rest, checks that every card fits on its page, and fixes any that do not.
