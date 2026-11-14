@@ -116,6 +116,26 @@ Bring a document's AI-content score under a target, 50% by default, without chan
 
 Claude drives both sites in your own Chrome, rewrites the most-flagged paragraphs a few at a time, checks every rewrite against the original, saves it into your file, and re-scores the whole document after each batch. It stops when the JustDone score is under the target.
 
+### It works: a real run
+
+A three-paragraph sample note, written in a typical AI style, was run through the skill on November 14, 2026.
+
+**Before.** JustDone flags every sentence: **100% Possibly AI**.
+
+<p align="center"><img src="docs/humanize-document/justdone-before.jpg" alt="JustDone AI Content Detector showing 100% Possibly AI, with every sentence of the sample highlighted" width="760"></p>
+
+**Grubby.** The batch goes into Grubby's humanizer (Academic mode); the original is on the left, the rewrite on the right.
+
+<p align="center"><img src="docs/humanize-document/grubby-humanized.jpg" alt="Grubby humanizer with the original sample on the left and the humanized version on the right" width="760"></p>
+
+**Meaning check.** Grubby's rewrite is not used as it is. Claude compared it sentence by sentence with the original and fixed what went wrong: "help avoid this knowledge being lost or lead to people making the same mistakes" now says the opposite of the original, so it became "stop people from making the same mistakes"; "writing them soon after the associated topic or person" went back to "soon after the event"; "putting information on paper" became "writing information down"; and the dropped "technical details" was restored.
+
+**After.** The checked text, saved into the Word file, scores **0% AI**.
+
+<p align="center"><img src="docs/humanize-document/justdone-after.jpg" alt="JustDone AI Content Detector showing 0% AI for the checked rewrite" width="760"></p>
+
+One batch of three paragraphs was enough here. A long document takes many batches, and scores move less per batch; see "How a round works" below.
+
 > **Subscriptions: this skill is not free to run.** Grubby and JustDone are paid services with their own plans and prices, and neither is part of Claude.
 >
 > - **Grubby**: the free tier has a small word allowance, so a whole document usually needs a paid plan. Even Grubby's "Unlimited" plan has a rolling daily cap (30,000 words per 24 hours in November 2026); when you hit it, the skill stops and tells you when words free up.
