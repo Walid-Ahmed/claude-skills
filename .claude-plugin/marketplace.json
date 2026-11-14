@@ -1,0 +1,26 @@
+{
+  "name": "walid-ahmed-skills",
+  "owner": {
+    "name": "Walid Ahmed"
+  },
+  "metadata": {
+    "description": "Skills for Claude: study flashcard decks, and a checked document humanizer",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "flashcard-deck",
+      "description": "Turn any subject, or material you already have (PDFs, slides, notes, a repo, Anki cards), into print-friendly A4 study flashcards grouped by topic, with PDFs, and optionally YouTube videos and thumbnails.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./flashcard-deck"]
+    },
+    {
+      "name": "humanize-document",
+      "description": "Bring a Word, Markdown or text document under a target AI score (50% by default) in the JustDone detector by rewriting its most-flagged paragraphs in Grubby, with Claude checking every rewrite for meaning. Needs paid Grubby and JustDone subscriptions and Claude in Chrome.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./humanize-document"]
+    }
+  ]
+}

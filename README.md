@@ -9,20 +9,28 @@ Skills for [Claude](https://claude.com), in Claude Code and the Claude app. A sk
 
 ## Install a skill
 
-**Claude Code** (works in every project on your machine):
+**Claude Code, as a plugin** (easiest; works in every project on your machine). Type these in Claude Code:
+
+```
+/plugin marketplace add Walid-Ahmed/claude-skills
+/plugin install flashcard-deck@walid-ahmed-skills
+/plugin install humanize-document@walid-ahmed-skills
+```
+
+Install only the skills you want. Restart Claude Code afterwards, then just ask for what a skill does ("make flashcards about Docker"). To get updates later: `/plugin marketplace update walid-ahmed-skills`.
+
+**Claude Code, by copying the folder** (if you prefer plain files):
 
 ```bash
 git clone https://github.com/Walid-Ahmed/claude-skills.git
 mkdir -p ~/.claude/skills
-cp -r claude-skills/flashcard-deck ~/.claude/skills/       # or any other skill folder
+cp -r claude-skills/flashcard-deck ~/.claude/skills/
 cp -r claude-skills/humanize-document ~/.claude/skills/
 ```
 
-Start a new Claude Code session afterwards. The skill is then listed, and you can call it by name (for example `/flashcard-deck`) or just ask for what it does.
+Start a new Claude Code session afterwards. The skill is then listed, and you can call it by name (for example `/flashcard-deck`) or just ask for what it does. To update, pull the repo and copy the folder again.
 
-**Claude app**: download the skill's file from [`dist/`](dist/) (for example [`dist/flashcard-deck.skill`](dist/flashcard-deck.skill)) and open it in Claude. If your account or organization allows custom skills, a **Save skill** button installs it.
-
-To update a skill, pull the repo and copy the folder again.
+**Claude app**: download the skill's file from [`dist/`](dist/) ([`flashcard-deck.skill`](dist/flashcard-deck.skill) or [`humanize-document.skill`](dist/humanize-document.skill)) and open it in Claude. If your account or organization allows custom skills, a **Save skill** button installs it. humanize-document works best in Claude Code, because it drives Grubby and JustDone in your Chrome and edits files on your computer.
 
 ---
 
