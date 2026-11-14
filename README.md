@@ -5,6 +5,7 @@ Skills for [Claude](https://claude.com), in Claude Code and the Claude app. A sk
 | Skill | What it does |
 | --- | --- |
 | [flashcard-deck](flashcard-deck/) | Turns any subject, or material you already have (lecture PDFs, slides, notes, a repo, existing Anki cards), into print-friendly study flashcards grouped by topic, with PDFs, and optionally YouTube videos and thumbnails. It starts by asking what you need. |
+| [humanize-document](humanize-document/) | Lowers a document's AI-content score below a target (50% by default) as measured by the **JustDone** AI detector, by rewriting its most-flagged paragraphs in the **Grubby** humanizer a few at a time. Claude checks every rewrite so facts, terms and formatting stay correct. Works on Word, Markdown and text files. **Needs paid Grubby and JustDone subscriptions.** |
 
 ## Install a skill
 
@@ -13,12 +14,13 @@ Skills for [Claude](https://claude.com), in Claude Code and the Claude app. A sk
 ```bash
 git clone https://github.com/Walid-Ahmed/claude-skills.git
 mkdir -p ~/.claude/skills
-cp -r claude-skills/flashcard-deck ~/.claude/skills/
+cp -r claude-skills/flashcard-deck ~/.claude/skills/       # or any other skill folder
+cp -r claude-skills/humanize-document ~/.claude/skills/
 ```
 
-Start a new Claude Code session afterwards. The skill is then listed, and you can call it by name (`/flashcard-deck`) or just ask for what it does.
+Start a new Claude Code session afterwards. The skill is then listed, and you can call it by name (for example `/flashcard-deck`) or just ask for what it does.
 
-**Claude app**: download [`dist/flashcard-deck.skill`](dist/flashcard-deck.skill) and open it in Claude. If your account or organization allows custom skills, a **Save skill** button installs it.
+**Claude app**: download the skill's file from [`dist/`](dist/) (for example [`dist/flashcard-deck.skill`](dist/flashcard-deck.skill)) and open it in Claude. If your account or organization allows custom skills, a **Save skill** button installs it.
 
 To update a skill, pull the repo and copy the folder again.
 
@@ -103,6 +105,74 @@ flashcard-deck/
     flashcards/                 the helpers, the renderer, and the card stylesheet
 ```
 
+---
+
+## humanize-document
+
+Bring a document's AI-content score under a target, 50% by default, without changing what it says. The skill works with two third-party websites, which you use through your own accounts:
+
+- **[Grubby](https://grubby.ai)** (grubby.ai): an AI humanizer that rewrites text so it reads less like AI output.
+- **[JustDone](https://justdone.ai)** (justdone.ai): an AI-content detector that scores the text ("NN% Possibly AI") and highlights the sentences it flags.
+
+Claude drives both sites in your own Chrome, rewrites the most-flagged paragraphs a few at a time, checks every rewrite against the original, saves it into your file, and re-scores the whole document after each batch. It stops when the JustDone score is under the target.
+
+> **Subscriptions: this skill is not free to run.** Grubby and JustDone are paid services with their own plans and prices, and neither is part of Claude.
+>
+> - **Grubby**: the free tier has a small word allowance, so a whole document usually needs a paid plan. Even Grubby's "Unlimited" plan has a rolling daily cap (30,000 words per 24 hours in November 2026); when you hit it, the skill stops and tells you when words free up.
+> - **JustDone**: every score spends AI-detector words for the whole document, so you need a paid plan or bought word packs. As a guide, a 5,000-word document scored ten times uses about 50,000 detector words. When the account runs out, the skill stops and tells you; it never buys words.
+>
+> Check each site's current pricing before you start. Claude never upgrades, buys, or signs in for you.
+
+Use it on your own writing, and follow the rules on AI-assisted writing of wherever you submit it (a school, journal, publisher or employer). AI detectors are not reliable judges of authorship; this skill only changes the wording that one detector flags, with every change checked for meaning.
+
+### How a round works
+
+1. **Score.** Claude extracts the document's prose (no headings, code, captions or tables), uploads it to the JustDone detector, and reads the score and the share of each paragraph that is highlighted.
+2. **Pick a batch.** Up to three paragraphs (250 to 600 words), most-flagged first, preferring consecutive paragraphs in one section: JustDone scores sentences in context, so finishing a section lowers the score far more than scattered edits.
+3. **Humanize.** Claude pastes the batch into Grubby (Academic mode) and clicks Humanize. It asks you once, at the start, whether it may do this for every batch.
+4. **Check the meaning.** Claude compares each rewritten sentence with the original and fixes only what went wrong: changed facts, numbers or scope ("every" turned into "most"), broken cross-references, synonyms for your defined terms, mangled code names, unclear phrases, and style the original avoided (contractions, emoji, a different spelling variant).
+5. **Save.** For Word files, a script replaces just those paragraphs, keeps each paragraph's own style and fonts, formats code names as code, backs the file up first, and checks that nothing else changed (tables and images included).
+6. **Re-score and report.** A small table of the score and each paragraph's share before and after, plus the fixes made.
+
+At the end, Claude re-reads every rewrite of the run together, catching problems one batch cannot see (a list split across two batches, a dangling "It"), and reports the start and final scores.
+
+### How to use it
+
+Ask in your own words:
+
+- "humanize `report.docx` until JustDone says it is under 50%"
+- "bring the AI score of `essay.md` below 30%"
+- "do three more paragraphs in Grubby"
+
+### Requirements
+
+- **A Grubby account** (paid plan recommended) and **a JustDone account** with detector words, both signed in in Chrome. See the subscriptions note above.
+- **[Claude in Chrome](https://claude.com/chrome)**, the browser extension, connected to Claude Code. Claude uses your signed-in Chrome; it does not sign in for you.
+- Python 3 with python-docx, for Word files: `pip install python-docx`
+- Microsoft Word closed on the file while Claude edits it.
+
+### What is in the folder
+
+```
+humanize-document/
+  SKILL.md                         what Claude follows: batches, Grubby, meaning check, saving, scoring
+  scripts/
+    doc_prose.py                   list prose paragraphs, show code names, write the text to score
+    replace_paragraphs.py          save rewrites into a Word file, keeping its formatting, with a backup and a run log
+    grubby_fill.js                 put a batch into Grubby's editor
+    grubby_read_output.js          read Grubby's Humanized or Polished output
+    justdone_paragraph_shares.js   read JustDone's score and each paragraph's highlighted share
+```
+
+You can run the Python scripts yourself:
+
+```bash
+python3 ~/.claude/skills/humanize-document/scripts/doc_prose.py report.docx --list
+python3 ~/.claude/skills/humanize-document/scripts/doc_prose.py report.docx --out prose.txt
+```
+
+Both websites change their pages from time to time. If a browser script stops finding things, Claude inspects the page and adjusts it.
+
 ## Building the .skill file
 
 After changing a skill, rebuild its file for the Claude app. It is a zip of the skill folder:
@@ -110,3 +180,5 @@ After changing a skill, rebuild its file for the Claude app. It is a zip of the 
 ```bash
 cd claude-skills && rm -f dist/flashcard-deck.skill && zip -r dist/flashcard-deck.skill flashcard-deck -x '*/__pycache__/*' '*.pyc' '*.DS_Store'
 ```
+
+Use the same command with another folder name, for example `humanize-document`.
