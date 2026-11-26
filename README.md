@@ -6,6 +6,7 @@ Skills for [Claude](https://claude.com), in Claude Code and the Claude app. A sk
 | --- | --- |
 | [flashcard-deck](flashcard-deck/) | Turns any subject, or material you already have (lecture PDFs, slides, notes, a repo, existing Anki cards), into print-friendly study flashcards grouped by topic, with PDFs, and optionally YouTube videos and thumbnails. It starts by asking what you need. |
 | [humanize-document](humanize-document/) | Lowers a document's AI-content score below a target (50% by default) as measured by the **JustDone** AI detector, by rewriting its most-flagged paragraphs in the **Grubby** humanizer a few at a time. Claude checks every rewrite so facts, terms and formatting stay correct. Works on Word, Markdown and text files. **Needs paid Grubby and JustDone subscriptions.** |
+| [book-writer](book-writer/) | Writes a book on any topic step by step: asks the topic, suggests titles, proposes an outline, writes chapters once you approve, tests every code sample, and ends by recommending a plagiarism and AI-content check. |
 
 ## Install a skill
 
@@ -15,6 +16,7 @@ Skills for [Claude](https://claude.com), in Claude Code and the Claude app. A sk
 /plugin marketplace add Walid-Ahmed/claude-skills
 /plugin install flashcard-deck@walid-ahmed-skills
 /plugin install humanize-document@walid-ahmed-skills
+/plugin install book-writer@walid-ahmed-skills
 ```
 
 Install only the skills you want. Restart Claude Code afterwards, then just ask for what a skill does ("make flashcards about Docker"). To get updates later: `/plugin marketplace update walid-ahmed-skills`.
@@ -26,11 +28,12 @@ git clone https://github.com/Walid-Ahmed/claude-skills.git
 mkdir -p ~/.claude/skills
 cp -r claude-skills/flashcard-deck ~/.claude/skills/
 cp -r claude-skills/humanize-document ~/.claude/skills/
+cp -r claude-skills/book-writer ~/.claude/skills/
 ```
 
 Start a new Claude Code session afterwards. The skill is then listed, and you can call it by name (for example `/flashcard-deck`) or just ask for what it does. To update, pull the repo and copy the folder again.
 
-**Claude app**: download the skill's file from [`dist/`](dist/) ([`flashcard-deck.skill`](dist/flashcard-deck.skill) or [`humanize-document.skill`](dist/humanize-document.skill)) and open it in Claude. If your account or organization allows custom skills, a **Save skill** button installs it. humanize-document works best in Claude Code, because it drives Grubby and JustDone in your Chrome and edits files on your computer.
+**Claude app**: download the skill's file from [`dist/`](dist/) ([`flashcard-deck.skill`](dist/flashcard-deck.skill), [`humanize-document.skill`](dist/humanize-document.skill) or [`book-writer.skill`](dist/book-writer.skill)) and open it in Claude. If your account or organization allows custom skills, a **Save skill** button installs it. humanize-document works best in Claude Code, because it drives Grubby and JustDone in your Chrome and edits files on your computer.
 
 ---
 
@@ -200,6 +203,27 @@ python3 ~/.claude/skills/humanize-document/scripts/doc_prose.py report.docx --ou
 ```
 
 Both websites change their pages from time to time. If a browser script stops finding things, Claude inspects the page and adjusts it.
+
+## book-writer
+
+Write a book on any subject, one approved step at a time.
+
+### How it works
+
+1. **Topic**: asks what the book is about, who the reader is, the rough length, and whether it has code.
+2. **Titles**: suggests five titles with subtitles.
+3. **Outline**: proposes chapters with summaries and page estimates, saved in Markdown and Word. Writing starts only after you approve it.
+4. **Chapters**: writes one chapter at a time with original text and cleanly formatted code (language-tagged blocks, a lead-in sentence, standard style, expected output).
+5. **Code check**: runs every Python and Bash block with `scripts/check_code.py`, fixes failures, and lists anything it could not run as not verified.
+6. **Finish**: combines the chapters into one manuscript and recommends a plagiarism check, an AI-content check, and a human review before publishing.
+
+### Checking code yourself
+
+```bash
+python3 book-writer/scripts/check_code.py chapter-01.md
+```
+
+Start a block with `# no-run` to skip fragments that are not meant to run on their own.
 
 ## Building the .skill file
 
