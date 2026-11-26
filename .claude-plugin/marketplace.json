@@ -4,7 +4,7 @@
     "name": "Walid Ahmed"
   },
   "metadata": {
-    "description": "Skills for Claude: study flashcard decks, and a checked document humanizer",
+    "description": "Skills for Claude: study flashcard decks, a checked document humanizer, and a step-by-step book writer",
     "version": "1.0.0"
   },
   "plugins": [
@@ -21,6 +21,13 @@
       "source": "./",
       "strict": false,
       "skills": ["./humanize-document"]
+    },
+    {
+      "name": "book-writer",
+      "description": "Write a book on any topic step by step: ask the topic, suggest titles, propose an outline, write chapters after approval, test all code, and finish with a plagiarism and AI-content check reminder.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./book-writer"]
     }
   ]
 }
